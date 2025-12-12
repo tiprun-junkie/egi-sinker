@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends { id: number; maker: string; name: string; weight: string }">
-	import { createEventDispatcher } from 'svelte';
+	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 
 	export let items: T[] = [];
@@ -7,23 +7,33 @@
 	export let placeholder: string = '選択してください';
 
 	let isOpen = false;
+	let root: HTMLDivElement;
 
 	$: selectedItem = items.find((item) => item.id === selectedId);
-
-	const dispatch = createEventDispatcher();
 
 	function selectItem(id: number) {
 		selectedId = id;
 		isOpen = false;
-		dispatch('change', { selectedId });
 	}
 
 	function toggleDropdown() {
 		isOpen = !isOpen;
 	}
+
+	onMount(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (isOpen && root && !root.contains(event.target as Node)) {
+				isOpen = false;
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside);
+
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	});
 </script>
 
-<div class="relative">
+<div class="relative" bind:this={root}>
 	<button
 		on:click={toggleDropdown}
 		class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-left flex justify-between items-center"
@@ -58,13 +68,21 @@
 
 	{#if isOpen}
 		<ul
+			role="listbox"
 			transition:slide={{ duration: 200 }}
-			class="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+			class="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-[40vh] rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
 		>
 			{#each items as item (item.id)}
 				<li
+					role="option"
+					aria-selected={selectedId === item.id}
+					tabindex="0"
 					on:click={() => selectItem(item.id)}
-					on:keydown
+					on:keydown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							selectItem(item.id);
+						}
+					}}
 					class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white"
 					class:bg-indigo-600={selectedId === item.id}
 					class:text-white={selectedId === item.id}

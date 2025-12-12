@@ -98,7 +98,7 @@
 			<!-- タブコンテンツ -->
 			{#if activeTab === 'egi'}
 				<div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-					<div class="mb-6">
+					<div class="sticky top-0 z-10 bg-white py-4 mb-2">
 						<ItemSelector
 							items={$tiprunData.egis}
 							bind:selectedId={selectedEgiId}
@@ -107,16 +107,15 @@
 					</div>
 
 					{#if selectedEgi}
-						<h3 class="text-lg font-semibold mb-3 text-gray-800">適合するシンカー</h3>
-						<ul class="space-y-4">
+						<ul class="space-y-3">
 							{#each selectedEgi.compatibility.filter((c) => c.status === 'OK') as comp (comp.sinkerId)}
 								{@const sinker = $tiprunData.sinkers[comp.sinkerId]}
 								{#if sinker}
 									{@const totalWeight =
 										parseWeight(selectedEgi.weight) + parseWeight(sinker.weight)}
 									{@const annotation = getAnnotationText(comp.status)}
-									<li class="bg-white rounded-lg shadow p-4">
-										<div class="flex justify-between items-start mb-2">
+									<li class="bg-white rounded-lg shadow px-4 py-3">
+										<div class="flex justify-between items-start">
 											<p class="font-semibold text-gray-800 flex-grow">
 												<span
 													class="block sm:inline text-xs sm:text-base text-gray-500 sm:text-gray-800"
@@ -138,7 +137,7 @@
 
 			{#if activeTab === 'sinker'}
 				<div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-					<div class="mb-6">
+					<div class="sticky top-0 z-10 bg-white py-4 mb-2">
 						<ItemSelector
 							items={$tiprunData.sinkers}
 							bind:selectedId={selectedSinkerId}
@@ -147,8 +146,7 @@
 					</div>
 
 					{#if compatibleEgis.length > 0}
-						<h3 class="text-lg font-semibold mb-3 text-gray-800">適合するエギ</h3>
-						<ul class="space-y-4">
+						<ul class="space-y-3">
 							{#each compatibleEgis as egi (egi.id)}
 								{@const status =
 									selectedSinkerId !== null
@@ -157,8 +155,8 @@
 								{#if checkSinker && status}
 									{@const totalWeight = parseWeight(egi.weight) + parseWeight(checkSinker.weight)}
 									{@const annotation = getAnnotationText(status)}
-									<li class="bg-white rounded-lg shadow p-4">
-										<div class="flex justify-between items-start mb-2">
+									<li class="bg-white rounded-lg shadow px-4 py-3">
+										<div class="flex justify-between items-start">
 											<p class="font-semibold text-gray-800 flex-grow">
 												<span
 													class="block sm:inline text-xs sm:text-base text-gray-500 sm:text-gray-800"
