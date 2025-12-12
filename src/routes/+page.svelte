@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tiprunData, getStatusClass, getAnnotationText } from '$lib/data';
+	import ItemSelector from './ItemSelector.svelte';
 	import type { Egi, Sinker } from '$lib/data';
 
 	let selectedEgiId: number | null = null;
@@ -97,30 +98,13 @@
 			<!-- タブコンテンツ -->
 			{#if activeTab === 'egi'}
 				<div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-					<select
-						bind:value={selectedEgiId}
-						class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mb-6"
-					>
-						<option value={null}>エギを選択してください</option>
-						{#each $tiprunData.egis as egi (egi.id)}
-							<option value={egi.id}>
-								{egi.maker}
-								{egi.name} ({egi.weight})
-							</option>
-						{/each}
-					</select>
-
-					{#if selectedEgi}
-						<div class="mb-6 p-3 bg-gray-100 rounded-md border border-gray-200 -mt-2">
-							<p class="text-sm text-gray-600">選択中のエギ:</p>
-							<p class="font-semibold text-gray-800 break-words">
-								<span class="block sm:inline text-xs sm:text-base text-gray-500 sm:text-gray-800"
-									>{selectedEgi.maker}</span
-								>
-								{selectedEgi.name} ({selectedEgi.weight})
-							</p>
-						</div>
-					{/if}
+					<div class="mb-6">
+						<ItemSelector
+							items={$tiprunData.egis}
+							bind:selectedId={selectedEgiId}
+							placeholder="エギを選択してください"
+						/>
+					</div>
 
 					{#if selectedEgi}
 						<h3 class="text-lg font-semibold mb-3 text-gray-800">適合するシンカー</h3>
@@ -154,30 +138,13 @@
 
 			{#if activeTab === 'sinker'}
 				<div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-					<select
-						bind:value={selectedSinkerId}
-						class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mb-6"
-					>
-						<option value={null}>シンカーを選択してください</option>
-						{#each $tiprunData.sinkers as sinker (sinker.id)}
-							<option value={sinker.id}>
-								{sinker.maker}
-								{sinker.name} ({sinker.weight})
-							</option>
-						{/each}
-					</select>
-
-					{#if checkSinker}
-						<div class="mb-6 p-3 bg-gray-100 rounded-md border border-gray-200 -mt-2">
-							<p class="text-sm text-gray-600">選択中のシンカー:</p>
-							<p class="font-semibold text-gray-800 break-words">
-								<span class="block sm:inline text-xs sm:text-base text-gray-500 sm:text-gray-800"
-									>{checkSinker.maker}</span
-								>
-								{checkSinker.name} ({checkSinker.weight})
-							</p>
-						</div>
-					{/if}
+					<div class="mb-6">
+						<ItemSelector
+							items={$tiprunData.sinkers}
+							bind:selectedId={selectedSinkerId}
+							placeholder="シンカーを選択してください"
+						/>
+					</div>
 
 					{#if compatibleEgis.length > 0}
 						<h3 class="text-lg font-semibold mb-3 text-gray-800">適合するエギ</h3>
@@ -214,64 +181,25 @@
 			{#if activeTab === 'check'}
 				<div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-						<div>
+						<div class="space-y-1">
 							<label for="egi-check" class="block text-sm font-medium text-gray-700">エギ</label>
-							<select
-								id="egi-check"
-								bind:value={selectedEgiId}
-								class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-							>
-								<option value={null}>エギを選択</option>
-								{#each $tiprunData.egis as egi (egi.id)}
-									<option value={egi.id}>{egi.maker} {egi.name} ({egi.weight})</option>
-								{/each}
-							</select>
+							<ItemSelector
+								items={$tiprunData.egis}
+								bind:selectedId={selectedEgiId}
+								placeholder="エギを選択"
+							/>
 						</div>
-						<div>
+						<div class="space-y-1">
 							<label for="sinker-check" class="block text-sm font-medium text-gray-700"
 								>シンカー</label
 							>
-							<select
-								id="sinker-check"
-								bind:value={selectedSinkerId}
-								class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-							>
-								<option value={null}>シンカーを選択</option>
-								{#each $tiprunData.sinkers as sinker (sinker.id)}
-									<option value={sinker.id}>{sinker.maker} {sinker.name} ({sinker.weight})</option>
-								{/each}
-							</select>
+							<ItemSelector
+								items={$tiprunData.sinkers}
+								bind:selectedId={selectedSinkerId}
+								placeholder="シンカーを選択"
+							/>
 						</div>
 					</div>
-
-					{#if selectedEgi || checkSinker}
-						<div class="mt-4 space-y-2">
-							{#if selectedEgi}
-								<div class="p-3 bg-gray-100 rounded-md border border-gray-200">
-									<p class="text-sm text-gray-600">選択中エギ:</p>
-									<p class="font-semibold text-gray-800 break-words">
-										<span
-											class="block sm:inline text-xs sm:text-base text-gray-500 sm:text-gray-800"
-											>{selectedEgi.maker}</span
-										>
-										{selectedEgi.name} ({selectedEgi.weight})
-									</p>
-								</div>
-							{/if}
-							{#if checkSinker}
-								<div class="p-3 bg-gray-100 rounded-md border border-gray-200">
-									<p class="text-sm text-gray-600">選択中シンカー:</p>
-									<p class="font-semibold text-gray-800 break-words">
-										<span
-											class="block sm:inline text-xs sm:text-base text-gray-500 sm:text-gray-800"
-											>{checkSinker.maker}</span
-										>
-										{checkSinker.name} ({checkSinker.weight})
-									</p>
-								</div>
-							{/if}
-						</div>
-					{/if}
 
 					{#if selectedEgi && checkSinker && checkStatus}
 						{@const annotation = getAnnotationText(checkStatus)}
